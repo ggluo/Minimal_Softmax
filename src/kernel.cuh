@@ -1,0 +1,8 @@
+#pragma once
+
+#include "kernel/common.cuh"
+#include "kernel/kernel_0.cuh"
+#include "kernel/kernel_1.cuh"
+#include "kernel/kernel_2.cuh"
+#include "kernel/kernel_3.cuh"
+#include "kernel/kernel_4.cuh"
