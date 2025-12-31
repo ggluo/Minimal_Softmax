@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     };
 
     // 使用与 Python 版本相同的参数
-    int batch_size = 2048*2;      // 较小的 batch_size 便于验证
+    int batch_size = 2048*16;      // 较小的 batch_size 便于验证
     int dim = 128;           // 与 softmax.py 中的 N=256 一致
     
     // 从文件读取 Python 输入向量
@@ -139,44 +139,10 @@ int main(int argc, char **argv)
         printf("Warning: Failed to save CUDA output to file\n");
     }
     
-    // 从文件读取 Python 参考输出（所有 CUDA kernel 都与 Python kernel 2 比较）
-    float *python_reference = (float *)malloc(dim * sizeof(float));
-    if (read_from_file("python_output_kernel2.txt", python_reference, dim)) {
-        // 比较 CUDA 输出（第一行）与 Python 参考输出
-        float max_err = 0.0f;
-        for (int i = 0; i < dim; i++) {
-            float err = fabsf(cpu_output[i] - python_reference[i]);
-            if (err > max_err) max_err = err;
-        }
-        
-        printf("\nValidation with Python kernel 2 (Safe Softmax):\n");
-        printf("  Maximum absolute error: %e\n", max_err);
-        
-        if (max_err < 1e-5f) {
-            printf("  ✅ PASS: CUDA kernel %d matches Python reference within tolerance\n", kernel_num);
-        } else {
-            printf("  ❌ FAIL: CUDA kernel %d differs from Python reference\n", kernel_num);
-            
-            // 打印前几个值的比较（用于调试）
-            printf("\n  First 5 values comparison:\n");
-            printf("  Index | CUDA Output | Python Ref | Difference\n");
-            printf("  ---------------------------------------------\n");
-            for (int i = 0; i < 5 && i < dim; i++) {
-                printf("  %5d | %11.6f | %10.6f | %11.6f\n", 
-                       i, cpu_output[i], python_reference[i], 
-                       cpu_output[i] - python_reference[i]);
-            }
-        }
-    } else {
-        printf("\nWarning: Could not read python_output_kernel2.txt for validation\n");
-    }
-    
     // 性能结果
     printf("\nPerformance results:\n");
     printf("  Batch size: %d, Dimension: %d\n", batch_size, dim);
-    printf("  Repeat count: %d\n", repeat);
-    printf("  Total time: %.3f ms\n", elapsed_time);
-    printf("  Average time per kernel: %.3f ms\n", elapsed_time / repeat);
+    printf("  Repeat count: %d， Total time: %.5f ms, avg time/repeat: %.5f ms\n", repeat, elapsed_time, elapsed_time / repeat);
     printf("  Throughput: %.2f elements/ms\n", 
            (size * repeat) / elapsed_time);
 
@@ -186,7 +152,6 @@ int main(int argc, char **argv)
     free(cpu_vector);
     free(cpu_input);
     free(cpu_output);
-    free(python_reference);
 
     return 0;
 }

@@ -130,27 +130,40 @@ void test_softmax_optimized(const float *__restrict input,
                            bool dummy) {
     // kernel_1 使用动态共享内存，每个 block 处理一行
     
-    if (dim > 256) {
-        dim3 block_dim(512, 1, 1);  // 假设 dim > 256
+    if (dim <= 128) {
+        dim3 block_dim(128, 1, 1);  // 假设 dim <= 128
         dim3 grid_dim(batch_size, 1, 1);
         size_t shared_mem_size = block_dim.x * sizeof(float);
         if (dummy) {
         printf("Launching dummy softmax_optimized Kernel to warmup: Grid[%d], Block[%d], SharedMem[%zu]\n", 
                grid_dim.x, block_dim.x, shared_mem_size);
-    }
+        }
     
-    softmax_optimized<<<grid_dim, block_dim, shared_mem_size>>>(input, output, batch_size, dim);
+        softmax_optimized<<<grid_dim, block_dim, shared_mem_size>>>(input, output, batch_size, dim);
     }
-    else {
+    else if (dim <= 256) {
         dim3 block_dim(256, 1, 1);  // 假设 dim <= 256
         dim3 grid_dim(batch_size, 1, 1);
         size_t shared_mem_size = block_dim.x * sizeof(float);
         if (dummy) {
         printf("Launching dummy softmax_optimized Kernel to warmup: Grid[%d], Block[%d], SharedMem[%zu]\n", 
+               grid_dim.x, block_dim.x, shared_mem_size);    }
+    
+        softmax_optimized<<<grid_dim, block_dim, shared_mem_size>>>(input, output, batch_size, dim);
+    }
+    else if (dim <= 512)
+    {
+        dim3 block_dim(512, 1, 1);  // 假设 dim <= 512
+        dim3 grid_dim(batch_size, 1, 1);
+        size_t shared_mem_size = block_dim.x * sizeof(float);
+        if (dummy) {
+        printf("Launching dummy softmax_optimized Kernel to warmup: Grid[%d], Block[%d], SharedMem[%zu]\n", 
                grid_dim.x, block_dim.x, shared_mem_size);
     }
-    
-    softmax_optimized<<<grid_dim, block_dim, shared_mem_size>>>(input, output, batch_size, dim);
+        softmax_optimized<<<grid_dim, block_dim, shared_mem_size>>>(input, output, batch_size, dim);
+    }
+    else {
+        printf("Error: Unsupported dim %d (Need to add more template instances)\n", dim);
     }
 }
 

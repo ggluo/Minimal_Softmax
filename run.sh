@@ -3,6 +3,8 @@
 echo "=== Softmax Kernel Testing Script ==="
 echo ""
 
+verbose=true
+
 # 步骤 1: 运行 Python 参考实现
 echo "Step 1: Running Python reference implementation..."
 if ! python3 softmax.py; then
@@ -39,30 +41,35 @@ do
     
     # 运行 CUDA kernel
     ./softmax ${i}
-    
-    # 使用 compare.py 比较结果
-    echo ""
-    echo "Comparing CUDA kernel ${i} with Python kernel 2 (Safe Softmax)..."
-    if python3 compare.py python_output_kernel2.txt kernel${i}_output.txt; then
-        echo "✅ Kernel ${i}: PASS"
-        # 保存输出文件到结果目录
-    else
-        echo "❌ Kernel ${i}: FAIL"
-        all_passed=false
-        # 保存输出文件到结果目录
+
+    if $verbose; then
+        # 使用 compare.py 比较结果
+        echo ""
+        echo "Comparing CUDA kernel ${i} with Python kernel 2 (Safe Softmax)..."
+        if python3 compare.py python_output_kernel2.txt kernel${i}_output.txt; then
+            echo "✅ Kernel ${i}: PASS"
+            # 保存输出文件到结果目录
+        else
+            echo "❌ Kernel ${i}: FAIL"
+            all_passed=fals
+            # 保存输出文件到结果目录
+        fi
     fi
-    
     echo ""
 done
 
 # 总结
 echo "=== Test Summary ==="
 echo ""
-if $all_passed; then
-    echo "✅ All 5 kernels passed validation!"
+if $verbose; then
+    if $all_passed; then
+        echo "✅ All 5 kernels passed validation!"
+    else
+        echo "❌ Some kernels failed validation."
+        echo "   Check the output files"
+    fi
 else
-    echo "❌ Some kernels failed validation."
-    echo "   Check the output files"
+    echo "Please check the output files manually"
 fi
 
 echo ""
