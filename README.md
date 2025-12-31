@@ -1,4 +1,4 @@
-# Minimal Softmax
+# Minimal Softmax Cuda Implementation
 
 A minimal CUDA implementation of softmax with multiple kernel variants for educational purposes.
 
