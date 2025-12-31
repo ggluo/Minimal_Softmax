@@ -4,55 +4,9 @@ A minimal CUDA implementation of softmax with multiple kernel variants for educa
 
 ## Overview
 
-This project implements and compares different softmax kernels in CUDA, ranging from basic to optimized versions. It includes a Python reference implementation for validation and a comprehensive testing framework.
+This project implements and compares different softmax kernels in CUDA, ranging from basic to optimized versions. It includes a Python reference implementation for validation and testing. 
 
-## Features
-
-- **5 CUDA Softmax Kernels**:
-  - Kernel 0: Basic implementation (naive)
-  - Kernel 1: Optimized with shared memory
-  - Kernel 2: Warp-level primitives
-  - Kernel 3: 2D block with warp primitives
-  - Kernel 4: Multi-row per warp with template parameters
-
-- **Python Reference Implementation**:
-  - Kernel 1: Naive softmax (numerically unstable)
-  - Kernel 2: Safe softmax (3-pass algorithm)
-  - Kernel 3: Online softmax (simulating FlashAttention tiling)
-
-- **Testing**:
-  - Automated build and test script (`run.sh`)
-  - File-based comparison between CUDA and Python outputs
-  - Performance measurement with CUDA events
-
-## Requirements
-
-- CUDA Toolkit (tested with CUDA 12.8)
-- CMake 3.10+
-- Python 3.6+ with PyTorch and NumPy
-- GCC/G++ with C++11 support
-
-## Quick Start
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/ggluo/Minimal_Softmax.git
-   cd Minimal_Softmax
-   ```
-
-2. **Run the complete test suite**:
-   ```bash
-   ./run.sh
-   ```
-
-   This will:
-   - Generate test data using Python
-   - Build all CUDA kernels
-   - Test each kernel (0-4)
-   - Compare CUDA outputs with Python reference
-   - Report performance metrics
-
-## Performance Comparison (on NVIDIA RTX 4500 Ada)
+### Performance Comparison (on NVIDIA RTX 4500 Ada)
 
 | Kernel | Description | Avg Time (ms) | Throughput (elements/ms) | Speedup vs Kernel 0 |
 |--------|-------------|---------------|--------------------------|---------------------|
@@ -74,6 +28,33 @@ This project implements and compares different softmax kernels in CUDA, ranging 
 - Batch Size: 32768
 - Dimension: 128
 - Repetitions: 100
+
+## Requirements
+
+- CUDA Toolkit (tested with CUDA 12.8)
+- CMake 3.10+
+- Python 3.6+ with NumPy
+- GCC/G++ with C++11 support
+
+## Quick Start
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/ggluo/Minimal_Softmax.git
+   cd Minimal_Softmax
+   ```
+
+2. **Run the complete test suite**:
+   ```bash
+   ./run.sh
+   ```
+
+   This will:
+   - Generate test data using Python
+   - Build all CUDA kernels
+   - Test each kernel (0-4)
+   - Compare CUDA outputs with Python reference
+   - Report performance metrics
 
 ## Kernel Details
 
@@ -104,9 +85,6 @@ This project implements and compares different softmax kernels in CUDA, ranging 
 - Assumes input dimension is up to 512
 
 ## Project Structure
-
-- **Kernel 4 Assumption**: Kernel 1 and 4 are designed for dimension up to 512. The test configuration uses dim=128 to ensure all kernels work correctly.
-- **Numerical Stability**: The Python implementation includes both numerically unstable (naive) and stable (safe) versions for comparison.
 
 ```
 Minimal_Softmax/
